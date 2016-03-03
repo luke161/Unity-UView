@@ -14,8 +14,8 @@ namespace UView {
 
 		public static string[] kTabs = new string[]{"View Controller","Settings"};
 
-		public const string kSettingsPath = "Assets/UView/Settings/";
-		public const string kSettingsAssetName = "UViewSettings.asset";
+		public const string kSettingsPath = "Assets/";
+		public const string kSettingsAssetName = "-UViewSettings.asset";
 		public const string kResources = "Resources/";
 
 		[MenuItem("GameObject/Create Other/UView/ViewController")]
