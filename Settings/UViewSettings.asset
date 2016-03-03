@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbdcde3f794204d68a074c9c8401c6f3, type: 3}
   m_Name: UViewSettings
   m_EditorClassIdentifier: 
-  prefabsPath: Assets/UViewDemo/Resources/View
-  scriptsPath: Assets/UViewDemo/Scripts/View
+  prefabsPath: Assets/Resources/Prefabs/View
+  scriptsPath: Assets/Scripts/Project/view
   scriptTemplate: {fileID: 4900000, guid: 57a4ff03cd6db4bea8314341e8c6e382, type: 3}
-  prefabTemplate: {fileID: 22467468, guid: d1bc77ede00094128b659e77c5d98ce3, type: 2}
+  prefabTemplate: {fileID: 456902, guid: d7ab7c0cad50b43f88e06d6b93ca35fb, type: 2}
