@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbdcde3f794204d68a074c9c8401c6f3, type: 3}
+  m_Name: UViewSettings
+  m_EditorClassIdentifier: 
+  prefabsPath: Assets/UViewDemo/Resources/View
+  scriptsPath: Assets/UViewDemo/Scripts/View
+  scriptTemplate: {fileID: 4900000, guid: 57a4ff03cd6db4bea8314341e8c6e382, type: 3}
+  prefabTemplate: {fileID: 22467468, guid: d1bc77ede00094128b659e77c5d98ce3, type: 2}

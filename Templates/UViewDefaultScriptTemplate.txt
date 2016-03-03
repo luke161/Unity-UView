@@ -1,0 +1,31 @@
+﻿using UnityEngine;
+using System.Collections;
+
+using UView;
+
+public class {VIEW_NAME} : AbstractView {
+
+	public {VIEW_NAME}() : base()
+	{
+
+	}
+
+	protected override void OnCreate ()
+	{
+		
+	}
+
+	protected override void OnShowStart (object data)
+	{
+		
+
+		OnShowComplete();
+	}
+
+	protected override void OnHideStart ()
+	{
+
+		OnHideComplete();
+	}
+
+}
