@@ -13,7 +13,6 @@ namespace UView {
 
 	// TODO : Code comments and author tags
 	// TODO : Support multiple view controllers in scene
-	// TODO : Sort order for views
 
 	[CustomEditor(typeof(ViewController))]
 	public class ViewControllerEditor : Editor 

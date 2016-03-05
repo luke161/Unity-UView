@@ -419,8 +419,8 @@ namespace UView {
 		{
 			if(_debug) Debug.LogFormat("[ViewController] Creating View: {0}, displayMode: {1}",asset.viewType.Name,displayMode);
 
+			// load the view resource
 			GameObject resource = null;
-
 			if(!IsViewLoaded(asset.viewType)){
 				resource = Resources.Load<GameObject>(asset.resourcePath);
 				_loadedResources.Add(asset.viewType,resource);
@@ -429,6 +429,7 @@ namespace UView {
 			}
 
 			if(resource!=null){
+				// create an instance of the view resource
 				AbstractView view = (Instantiate (resource) as GameObject).GetComponent<AbstractView>();
 
 				if(view==null){
@@ -436,7 +437,12 @@ namespace UView {
 					throw new UnityException(string.Format("Resource for {0} has no view component attached!",asset.viewType));
 				}
 
+				// setup view inside viewParent
 				view.transform.SetParent(viewParent,false);
+				int siblingIndex = view.GetSiblingIndex(viewParent);
+				if(siblingIndex>-1) view.transform.SetSiblingIndex(siblingIndex);
+
+				// finish view creation
 				view._Create (this,displayMode);
 
 				if (EventViewCreated != null)

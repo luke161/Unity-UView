@@ -93,6 +93,11 @@ namespace UView {
 			Destroy(gameObject);
 		}
 
+		public virtual int GetSiblingIndex(Transform viewParent)
+		{
+			return viewParent==null ? -1 : viewParent.childCount;
+		}
+
 		public void ChangeLocation<T>(object data = null) where T : AbstractView
 		{
 			ChangeLocation(typeof(T),data);
