@@ -3,6 +3,11 @@ using UnityEditor;
 using System.IO;
 using System.Collections;
 
+/**
+ * CreateViewWindow.cs
+ * Author: Luke Holland (http://lukeholland.me/)
+ */
+
 namespace UView {
 
 	public class CreateViewWindow : EditorWindow

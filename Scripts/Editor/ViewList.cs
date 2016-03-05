@@ -3,6 +3,11 @@ using UnityEditor;
 using UnityEditorInternal;
 using System.Collections;
 
+/**
+ * ViewList.cs
+ * Author: Luke Holland (http://lukeholland.me/)
+ */
+
 namespace UView {
 
 	public class ViewList : ReorderableList

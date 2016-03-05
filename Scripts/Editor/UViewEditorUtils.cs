@@ -4,6 +4,11 @@ using UnityEditor;
 using System.Collections;
 using System.IO;
 
+/**
+ * UViewEditorUtils.cs
+ * Author: Luke Holland (http://lukeholland.me/)
+ */
+
 namespace UView {
 
 	public static class UViewEditorUtils 

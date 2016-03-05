@@ -2,13 +2,24 @@ using UnityEngine;
 using System.Collections;
 using System.Timers;
 
+/**
+ * AbstractView.cs
+ * Author: Luke Holland (http://lukeholland.me/)
+ */
+
 namespace UView {
 
+	/// <summary>
+	/// View display mode.
+	/// </summary>
 	public enum ViewDisplayMode {
 		Location,
 		Overlay
 	}
 
+	/// <summary>
+	/// Abstract view.
+	/// </summary>
 	public abstract class AbstractView : MonoBehaviour{
 
 		public ViewDisplayMode displayMode { get; private set; }
@@ -147,11 +158,6 @@ namespace UView {
 			
 			OnCreate();
 		}	
-
-		protected void Update()
-		{
-			if(IsShowing && !IsHiding) OnViewUpdate();
-		}
 		
 		/// <summary>
 		/// Called after <c>show()</c>, override this method to provide custom setup and transition behaviour for your view.
@@ -194,11 +200,6 @@ namespace UView {
 		protected virtual void OnCreate()
 		{
 			
-		}
-
-		protected virtual void OnViewUpdate()
-		{
-
 		}
 
 	}

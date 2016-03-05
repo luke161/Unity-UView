@@ -1,6 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+/**
+ * ViewController.cs
+ * Author: Luke Holland (http://lukeholland.me/)
+ */
+
 namespace UView {
 
 	[System.Serializable]

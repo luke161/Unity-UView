@@ -2,6 +2,11 @@
 using UnityEditor;
 using System.Collections;
 
+/**
+ * UViewSettings.cs
+ * Author: Luke Holland (http://lukeholland.me/)
+ */
+
 namespace UView {
 
 	public class UViewSettings : ScriptableObject

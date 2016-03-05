@@ -2,6 +2,11 @@
 using UnityEditor;
 using System.Collections;
 
+/**
+ * UViewCreator.cs
+ * Author: Luke Holland (http://lukeholland.me/)
+ */
+
 namespace UView {
 
 	[InitializeOnLoad]

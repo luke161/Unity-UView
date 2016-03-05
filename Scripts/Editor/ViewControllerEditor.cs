@@ -4,6 +4,11 @@ using UnityEditorInternal;
 using System.Collections;
 using System.IO;
 
+/**
+ * ViewControllerEditor.cs
+ * Author: Luke Holland (http://lukeholland.me/)
+ */
+
 namespace UView {
 
 	// TODO : Code comments and author tags
