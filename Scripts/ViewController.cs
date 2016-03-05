@@ -316,7 +316,7 @@ namespace UView {
 				Object resource = _loadedResources[view];
 				_loadedResources.Remove(view);
 
-				Resources.UnloadAsset(resource);
+				//Resources.UnloadAsset(resource);
 			}
 		}
 
@@ -326,7 +326,7 @@ namespace UView {
 		public void UnloadAll()
 		{
 			foreach(Object viewResource in _loadedResources.Values){
-				Resources.UnloadAsset(viewResource);
+				//Resources.UnloadAsset(viewResource);
 			}
 
 			_loadedResources.Clear();
