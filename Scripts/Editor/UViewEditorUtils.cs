@@ -95,14 +95,15 @@ namespace UView {
 
 			EditorGUILayout.PrefixLabel(label);
 			EditorGUILayout.SelectableLabel(currentPath,GUILayout.Height(EditorGUIUtility.singleLineHeight));
-			if(GUILayout.Button("...",EditorStyles.miniButton)){
+			bool pressed = GUILayout.Button("...",EditorStyles.miniButton);
+			EditorGUILayout.EndHorizontal();
+
+			if(pressed){
 				string path = EditorUtility.OpenFolderPanel(label,currentPath,string.Empty);
 				if(!string.IsNullOrEmpty(path)){
 					currentPath = path.Replace(Application.dataPath.Substring(0,Application.dataPath.Length-6),string.Empty);
 				}
 			}
-
-			EditorGUILayout.EndHorizontal();
 
 			return currentPath;
 		}
