@@ -40,10 +40,10 @@ namespace UView {
 		/// Reference to the ViewController that manages this view.
 		/// </summary>
 		protected ViewController _controller;
-						/// <summary>
+						
+		/// <summary>
 		/// Initializes a new instance of the <see cref="AbstractView"/> class.
 		/// </summary>
-		/// <param name="viewName">View name.</param>
 		public AbstractView()
 		{
 			

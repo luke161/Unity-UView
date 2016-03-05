@@ -34,13 +34,13 @@ namespace UView {
 	public class ViewController : MonoBehaviour
 	{
 
-		public delegate void ViewEvent(ViewController sender, System.Type view);
+		public delegate void ViewEvent(ViewController sender, System.Type view, ViewDisplayMode displayMode);
 
 		public event ViewEvent EventShowStart;
 		public event ViewEvent EventShowComplete;
 		public event ViewEvent EventHideStart;
 		public event ViewEvent EventHideComplete;
-		public event ViewEvent EventLocationRequested;
+		public event ViewEvent EventViewRequested;
 		public event ViewEvent EventViewCreated;
 
 		public bool IsSetup { get; private set; }
@@ -127,7 +127,8 @@ namespace UView {
 			return IsOverlayShowing(typeof(T));
 		}
 
-		public bool IsOverlayShowing(System.Type view){
+		public bool IsOverlayShowing(System.Type view)
+		{
 			int i = 0, l = _showingOverlays.Count;
 			for(; i<l; ++i){
 				AbstractView overlay = _showingOverlays[i];
@@ -137,7 +138,8 @@ namespace UView {
 			return false;
 		}
 
-		public bool IsOverlayShowing(AbstractView overlay) {
+		public bool IsOverlayShowing(AbstractView overlay) 
+		{
 			return _showingOverlays.Contains(overlay);
 		}
 
@@ -185,7 +187,7 @@ namespace UView {
 
 				if(_debug) Debug.LogFormat("[ViewController] Requesting Location: {0}, immediate: {1}",view.Name,immediate);
 				
-				if(EventLocationRequested!=null) EventLocationRequested(this,_targetLocation);
+				if(EventViewRequested!=null) EventViewRequested(this,view,ViewDisplayMode.Location);
 
 				if(_currentLocation==null){
 					CreateViewAsLocation(view,data);
@@ -210,6 +212,10 @@ namespace UView {
 			if(!HasView(view)){
 				throw new UnityException (string.Format("Invalid view type: {0}",view));
 			}
+
+			if(_debug) Debug.LogFormat("[ViewController] Requesting Overlay: {0}",view.Name);
+
+			if(EventViewRequested!=null) EventViewRequested(this,view,ViewDisplayMode.Overlay);
 			
 			if(closeOverlay!=null && IsOverlayShowing(closeOverlay)){
 				_targetOverlay = view;
@@ -333,21 +339,21 @@ namespace UView {
 		{
 			if(_debug) Debug.LogFormat("[ViewController] Show Start: {0}",view.ToString());
 
-			if(view!=null && EventShowStart!=null) EventShowStart(this,view.GetType());	
+			if(view!=null && EventShowStart!=null) EventShowStart(this,view.GetType(),view.displayMode);	
 		}
 
 		internal void _OnShowComplete(AbstractView view)
 		{
 			if(_debug) Debug.LogFormat("[ViewController] Show Complete: {0}",view.ToString());
 
-			if(view!=null && EventShowComplete!=null) EventShowComplete(this,view.GetType());	
+			if(view!=null && EventShowComplete!=null) EventShowComplete(this,view.GetType(),view.displayMode);	
 		}
 
 		internal void _OnHideStart(AbstractView view)
 		{
 			if(_debug) Debug.LogFormat("[ViewController] Hide Start: {0}",view.ToString());
 
-			if(view!=null && EventHideStart!=null) EventHideStart(this,view.GetType());	
+			if(view!=null && EventHideStart!=null) EventHideStart(this,view.GetType(),view.displayMode);	
 		}
 
 		internal void _OnHideComplete(AbstractView view, bool destroy = true)
@@ -356,7 +362,7 @@ namespace UView {
 
 			if(_debug) Debug.LogFormat("[ViewController] Hide Complete: {0}, destroy: {1}",view.ToString(),destroy);
 
-			if(EventHideComplete!=null) EventHideComplete(this,view.GetType());
+			if(EventHideComplete!=null) EventHideComplete(this,view.GetType(),view.displayMode);
 
 			if(destroy) view.DestroyView();
 
@@ -409,7 +415,7 @@ namespace UView {
 			overlay.Show(data);
 		}
 
-		private AbstractView CreateView(ViewAsset asset, ViewDisplayMode displayMode)
+		protected virtual AbstractView CreateView(ViewAsset asset, ViewDisplayMode displayMode)
 		{
 			if(_debug) Debug.LogFormat("[ViewController] Creating View: {0}, displayMode: {1}",asset.viewType.Name,displayMode);
 
@@ -434,7 +440,7 @@ namespace UView {
 				view._Create (this,displayMode);
 
 				if (EventViewCreated != null)
-					EventViewCreated (this, asset.viewType);
+					EventViewCreated (this, asset.viewType, view.displayMode);
 
 				return view;
 			} else {
