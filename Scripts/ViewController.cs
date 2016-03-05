@@ -439,7 +439,7 @@ namespace UView {
 
 				// setup view inside viewParent
 				view.transform.SetParent(viewParent,false);
-				int siblingIndex = view.GetSiblingIndex(viewParent);
+				int siblingIndex = view.GetSiblingIndex(viewParent,displayMode);
 				if(siblingIndex>-1) view.transform.SetSiblingIndex(siblingIndex);
 
 				// finish view creation

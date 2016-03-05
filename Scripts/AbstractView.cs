@@ -93,9 +93,9 @@ namespace UView {
 			Destroy(gameObject);
 		}
 
-		public virtual int GetSiblingIndex(Transform viewParent)
+		public virtual int GetSiblingIndex(Transform viewParent, ViewDisplayMode displayMode)
 		{
-			return viewParent==null ? -1 : viewParent.childCount;
+			return viewParent==null ? -1 : displayMode== ViewDisplayMode.Location ? 0 : viewParent.childCount;
 		}
 
 		public void ChangeLocation<T>(object data = null) where T : AbstractView
