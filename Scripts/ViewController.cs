@@ -313,7 +313,7 @@ namespace UView {
 			if(IsViewLoaded(view)){
 				if(_debug) Debug.LogFormat("[ViewController] Unload View: {0}",view.Name);
 
-				Object resource = _loadedResources[view];
+				//Object resource = _loadedResources[view];
 				_loadedResources.Remove(view);
 
 				//Resources.UnloadAsset(resource);
@@ -325,9 +325,9 @@ namespace UView {
 		/// </summary>
 		public void UnloadAll()
 		{
-			foreach(Object viewResource in _loadedResources.Values){
+			//foreach(Object viewResource in _loadedResources.Values){
 				//Resources.UnloadAsset(viewResource);
-			}
+			//}
 
 			_loadedResources.Clear();
 		}
