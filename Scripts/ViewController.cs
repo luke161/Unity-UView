@@ -96,7 +96,7 @@ namespace UView {
 		public int loadedResourceCount {
 			get { 
 				int count = 0;
-				foreach(ViewAsset asset in _viewAssets) if(asset.IsResourceLoaded) count++;
+				foreach(ViewAsset asset in _assetLookup.Values) if(asset.IsResourceLoaded) count++;
 
 				return count; 
 			}
@@ -306,7 +306,7 @@ namespace UView {
 		/// </summary>
 		public void UnloadAll()
 		{
-			foreach(ViewAsset viewAsset in _viewAssets){
+			foreach(ViewAsset viewAsset in _assetLookup.Values){
 				viewAsset.Unload(true);
 			}
 		}
