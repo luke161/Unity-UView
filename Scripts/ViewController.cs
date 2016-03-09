@@ -33,8 +33,8 @@ namespace UView {
 
 		private AbstractView _currentLocation;
 		private System.Type _targetLocation;
-		private object _targetLocationData;
 		private System.Type _lastLocation;	
+		private object _targetLocationData;
 
 		private List<AbstractView> _showingOverlays;
 		private System.Type _targetOverlay;
@@ -118,9 +118,9 @@ namespace UView {
 			return false;
 		}
 
-		public bool IsOverlayShowing(AbstractView overlay) 
+		public bool IsOverlayShowing(AbstractView view) 
 		{
-			return _showingOverlays.Contains(overlay);
+			return _showingOverlays.Contains(view);
 		}
 
 		public bool HasView<T>() where T : AbstractView
@@ -176,22 +176,22 @@ namespace UView {
 				if(_currentLocation==null){
 					CreateViewAsLocation(view,data);
 				} else if(immediate){
-					_currentLocation.Hide();
+					_currentLocation._Hide();
 					CreateViewAsLocation(view,data);
 				} else {
 					_targetLocation = view;
 					_targetLocationData = data;
-					_currentLocation.Hide();
+					_currentLocation._Hide();
 				}
 			}
 		}
 
-		public void OpenOverlay<T>(object data, AbstractView closeOverlay) where T : AbstractView
+		public void OpenOverlay<T>(object data, AbstractView waitForViewToClose) where T : AbstractView
 		{
-			OpenOverlay(typeof(T),data,closeOverlay);
+			OpenOverlay(typeof(T),data,waitForViewToClose);
 		}
 
-		public void OpenOverlay(System.Type view, object data, AbstractView closeOverlay)
+		public void OpenOverlay(System.Type view, object data, AbstractView waitForViewToClose)
 		{
 			if(!HasView(view)){
 				throw new UnityException (string.Format("Invalid view type: {0}",view));
@@ -201,19 +201,19 @@ namespace UView {
 
 			if(EventViewRequested!=null) EventViewRequested(this,view,ViewDisplayMode.Overlay);
 			
-			if(closeOverlay!=null && IsOverlayShowing(closeOverlay)){
+			if(waitForViewToClose!=null && IsOverlayShowing(waitForViewToClose)){
 				_targetOverlay = view;
 				_targetOverlayData = data;
 
-				CloseOverlay(closeOverlay);
+				CloseOverlay(waitForViewToClose);
 			} else {
 				CreateViewAsOverlay(view,data);
 			}
 		}
 
-		public void OpenOverlay<T>(object data, bool closeAllOpenOverlays) where T : AbstractView
+		public void OpenOverlay<T>(object data, bool waitForAllOverlaysToClose) where T : AbstractView
 		{
-			OpenOverlay(typeof(T),data,closeAllOpenOverlays);
+			OpenOverlay(typeof(T),data,waitForAllOverlaysToClose);
 		}
 
 		/// <summary>
@@ -228,13 +228,13 @@ namespace UView {
 		/// <param name='closeAll'>
 		/// Setting <c>closeAll</c> to true will close all open overlays and delay the <c>targetOverlay</c> from showing until they have all hidden.
 		/// </param>
-		public void OpenOverlay(System.Type view, object data, bool closeAllOpenOverlays)
+		public void OpenOverlay(System.Type view, object data, bool waitForAllOverlaysToClose)
 		{
 			if(!HasView(view)){
 				throw new UnityException (string.Format("Invalid view name: {0}",view));
 			}
 
-			if(closeAllOpenOverlays && _showingOverlays.Count>0){
+			if(waitForAllOverlaysToClose && _showingOverlays.Count>0){
 				_targetOverlay = view;
 				_targetOverlayData = data;
 
@@ -268,18 +268,18 @@ namespace UView {
 			}
 		}
 
-		public void CloseOverlay(AbstractView overlay)
+		public void CloseOverlay(AbstractView view)
 		{
-			if(IsOverlayShowing(overlay)){
-				overlay.Hide();
+			if(IsOverlayShowing(view)){
+				view._Hide();
 			}
 		}
 
 		public void CloseAllOverlays()
 		{
 			AbstractView[] e = showingOverlays;
-			foreach(AbstractView overlay in e){
-				overlay.Hide();
+			foreach(AbstractView view in e){
+				view._Hide();
 			}	
 		}
 
@@ -383,7 +383,7 @@ namespace UView {
 
 			// create next location
 			_currentLocation = CreateView (_assetLookup[view], ViewDisplayMode.Location);
-			_currentLocation.Show(data);
+			_currentLocation._Show(data);
 		}
 
 		private void CreateViewAsOverlay(System.Type view, object data)
@@ -391,7 +391,7 @@ namespace UView {
 			AbstractView overlay = CreateView (_assetLookup[view],ViewDisplayMode.Overlay) as AbstractView;
 
 			_showingOverlays.Add(overlay);
-			overlay.Show(data);
+			overlay._Show(data);
 		}
 
 		protected virtual AbstractView CreateView(ViewAsset asset, ViewDisplayMode displayMode)
