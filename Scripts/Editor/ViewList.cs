@@ -13,6 +13,8 @@ namespace UView {
 	public class ViewList : ReorderableList
 	{
 
+		public bool requiresRebuild = false;
+
 		private SerializedProperty _propertyViewParent;
 
 		public ViewList(SerializedObject serializedObject, SerializedProperty elements) : base(serializedObject,elements)
@@ -57,6 +59,7 @@ namespace UView {
 				}
 			} else {
 				EditorGUI.LabelField(new Rect(rect.x,rect.y,rect.width,rect.height),string.Format("{0} (Asset Missing)",viewName),EditorStyles.boldLabel);
+				requiresRebuild = true;
 			}
 		}
 

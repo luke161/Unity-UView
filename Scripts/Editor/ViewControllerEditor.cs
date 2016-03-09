@@ -35,9 +35,12 @@ namespace UView {
 
 		private ViewList _viewList;
 		private int _tabIndex;
+		private bool _attemptedRebuild;
 
 		protected void OnEnable()
 		{
+			_attemptedRebuild = false;
+
 			_propertyAutoSetup = serializedObject.FindProperty("_autoSetup");
 			_propertyDontDestroyOnLoad = serializedObject.FindProperty("_dontDestroyOnLoad");
 			_propertyDebug = serializedObject.FindProperty("_debug");
@@ -135,7 +138,14 @@ namespace UView {
 			bool locked = EditorApplication.isCompiling && EditorPrefs.HasKey(UViewEditorUtils.KEY_SCRIPT_PATH);
 			EditorGUI.BeginDisabledGroup(locked);
 
+			_viewList.requiresRebuild = false;
 			_viewList.DoLayoutList();
+			if(_viewList.requiresRebuild && !_attemptedRebuild){
+				Debug.LogWarning("Views missing or changed, rebuilding...");
+				UViewEditorUtils.Rebuild(_propertyViewAssets);
+				_viewList.requiresRebuild = false;
+				_attemptedRebuild = true;
+			}
 
 			EditorGUI.EndDisabledGroup();
 
@@ -144,6 +154,7 @@ namespace UView {
 			EditorGUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
 			if(GUILayout.Button("Rebuild",GUILayout.Width(80))){
+				_attemptedRebuild = false;
 				UViewEditorUtils.Rebuild(_propertyViewAssets);
 			}
 			EditorGUILayout.EndHorizontal();
