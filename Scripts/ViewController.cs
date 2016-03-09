@@ -8,29 +8,6 @@ using System.Collections.Generic;
 
 namespace UView {
 
-	[System.Serializable]
-	public class ViewAsset 
-	{
-
-		public string viewTypeID;
-		public string resourcePath;
-		public string assetID;
-
-		public ViewAsset(string viewTypeID, string resourcePath, string assetID)
-		{
-			this.viewTypeID = viewTypeID;
-			this.resourcePath = resourcePath;
-			this.assetID = assetID;
-		}
-
-		public System.Type viewType {
-			get {
-				return System.Type.GetType(viewTypeID);
-			}
-		}
-
-	}
-
 	public class ViewController : MonoBehaviour
 	{
 
@@ -53,7 +30,6 @@ namespace UView {
 		[SerializeField] private List<ViewAsset> _viewAssets;
 
 		private Dictionary<System.Type,ViewAsset> _assetLookup;
-		private Dictionary<System.Type,Object> _loadedResources;
 
 		private AbstractView _currentLocation;
 		private System.Type _targetLocation;
@@ -76,7 +52,6 @@ namespace UView {
 			if(_dontDestroyOnLoad) DontDestroyOnLoad(gameObject);
 
 			_assetLookup = new Dictionary<System.Type, ViewAsset>();
-			_loadedResources = new Dictionary<System.Type, Object>();
 			_showingOverlays = new List<AbstractView> ();
 
 			int i = 0, l = _viewAssets.Count;
@@ -119,7 +94,12 @@ namespace UView {
 		}
 
 		public int loadedResourceCount {
-			get { return _loadedResources.Count; }
+			get { 
+				int count = 0;
+				foreach(ViewAsset asset in _viewAssets) if(asset.IsResourceLoaded) count++;
+
+				return count; 
+			}
 		}
 
 		public bool IsOverlayShowing<T>() where T : AbstractView
@@ -160,7 +140,11 @@ namespace UView {
 
 		public bool IsViewLoaded(System.Type viewId)
 		{
-			return _loadedResources.ContainsKey(viewId);
+			if(_assetLookup.ContainsKey(viewId)){
+				return _assetLookup[viewId].IsResourceLoaded;
+			} else {
+				return false;
+			}
 		}
 
 		public void ChangeLocation<T>(object data, bool immediate) where T : AbstractView
@@ -313,10 +297,7 @@ namespace UView {
 			if(IsViewLoaded(view)){
 				if(_debug) Debug.LogFormat("[ViewController] Unload View: {0}",view.Name);
 
-				//Object resource = _loadedResources[view];
-				_loadedResources.Remove(view);
-
-				//Resources.UnloadAsset(resource);
+				_assetLookup[view].Unload();
 			}
 		}
 
@@ -325,11 +306,9 @@ namespace UView {
 		/// </summary>
 		public void UnloadAll()
 		{
-			//foreach(Object viewResource in _loadedResources.Values){
-				//Resources.UnloadAsset(viewResource);
-			//}
-
-			_loadedResources.Clear();
+			foreach(ViewAsset viewAsset in _viewAssets){
+				viewAsset.Unload(true);
+			}
 		}
 
 		// All view behavour comes through the ViewController, this allows events which other views or gameObjects
@@ -420,13 +399,7 @@ namespace UView {
 			if(_debug) Debug.LogFormat("[ViewController] Creating View: {0}, displayMode: {1}",asset.viewType.Name,displayMode);
 
 			// load the view resource
-			GameObject resource = null;
-			if(!IsViewLoaded(asset.viewType)){
-				resource = Resources.Load<GameObject>(asset.resourcePath);
-				_loadedResources.Add(asset.viewType,resource);
-			} else {
-				resource = _loadedResources[asset.viewType] as GameObject;
-			}
+			GameObject resource = asset.Load() as GameObject;
 
 			if(resource!=null){
 				// create an instance of the view resource
@@ -451,6 +424,62 @@ namespace UView {
 				return view;
 			} else {
 				throw new UnityException(string.Format("Resource not found for: {0}",asset.viewType));
+			}
+		}
+
+	}
+
+
+
+	[System.Serializable]
+	public class ViewAsset 
+	{
+
+		public string viewTypeID;
+		public string resourcePath;
+		public string assetID;
+
+		internal int referenceCount { get; private set; }
+		internal Object resource { get; private set; }
+
+		public ViewAsset(string viewTypeID, string resourcePath, string assetID)
+		{
+			this.viewTypeID = viewTypeID;
+			this.resourcePath = resourcePath;
+			this.assetID = assetID;
+		}
+
+		internal bool IsResourceLoaded{
+			get { return resource!=null && referenceCount>0; }
+		}
+
+		internal Object Load()
+		{
+			if(this.resource==null){
+				this.resource = Resources.Load(resourcePath);
+				this.referenceCount = 1;
+			} else {
+				this.referenceCount++;
+			}
+
+			return resource;
+		}
+
+		internal void Unload(bool force = false)
+		{
+			if(resource==null) return;
+
+			this.referenceCount = force ? 0 : Mathf.Max(0,referenceCount-1);
+
+			if(referenceCount<=0){
+				//Resources.UnloadAsset(resource);
+				this.resource = null;
+			}
+		}
+
+		public System.Type viewType {
+			get {
+				return System.Type.GetType(viewTypeID);
 			}
 		}
 

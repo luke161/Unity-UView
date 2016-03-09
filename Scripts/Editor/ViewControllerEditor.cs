@@ -100,7 +100,7 @@ namespace UView {
 
 			EditorGUILayout.LabelField("Locations",EditorStyles.boldLabel);
 
-			UViewEditorUtils.LayoutLabelWithPrefix("Current Location",string.Format("{0} ({1})",viewController.currentLocation,viewController.currentLocation.state));
+			UViewEditorUtils.LayoutLabelWithPrefix("Current Location",string.Format("{0} ({1})",viewController.currentLocation.GetType(),viewController.currentLocation.state));
 			UViewEditorUtils.LayoutLabelWithPrefix("Last Location",viewController.lastLocation);
 			UViewEditorUtils.LayoutLabelWithPrefix("Target Location",viewController.targetLocation);
 
