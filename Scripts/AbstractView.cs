@@ -17,24 +17,21 @@ namespace UView {
 		Overlay
 	}
 
+	public enum ViewState {
+		Creating,
+		Showing,
+		Hiding,
+		Active,
+		Destroyed
+	}
+
 	/// <summary>
 	/// Abstract view.
 	/// </summary>
 	public abstract class AbstractView : MonoBehaviour{
 
 		public ViewDisplayMode displayMode { get; private set; }
-			
-		/// <summary>
-		/// Is this view showing. Set to 'true' after a call to Show()
-		/// </summary>
-		/// <value><c>true</c> if this instance is showing; otherwise, <c>false</c>.</value>
-		public bool IsShowing { get; private set; }
-
-		/// <summary>
-		/// Is this view currently hiding. Set to 'true' after a call to Hide()
-		/// </summary>
-		/// <value><c>true</c> if this instance is hiding; otherwise, <c>false</c>.</value>
-		public bool IsHiding { get; private set; }
+		public ViewState state { get; private set; }
 
 		/// <summary>
 		/// Reference to the ViewController that manages this view.
@@ -46,7 +43,7 @@ namespace UView {
 		/// </summary>
 		public AbstractView()
 		{
-			
+			state = ViewState.Creating;
 		}
 
 		public override string ToString ()
@@ -62,12 +59,13 @@ namespace UView {
 		/// </param>
 		public void Show(object data=null){
 			
-			if(IsShowing){
+			if(state==ViewState.Active || state==ViewState.Showing){
 				OnHideComplete();	
 			}
 
 			if(!gameObject.activeSelf) gameObject.SetActive(true);
-			
+
+			state = ViewState.Showing;
 			_controller._OnShowStart(this);
 			OnShowStart(data);		
 		}
@@ -76,9 +74,9 @@ namespace UView {
 		/// </summary>
 		public void Hide()
 		{
-			if(IsShowing){
-				IsShowing = false;
-				IsHiding = true;
+			if(state==ViewState.Active || state==ViewState.Showing){
+				state = ViewState.Hiding;
+
 				_controller._OnHideStart(this);
 				OnHideStart();	
 			}
@@ -89,7 +87,11 @@ namespace UView {
 		/// </summary>
 		public virtual void DestroyView()
 		{
+			state = ViewState.Destroyed;
+
 			_controller.Unload(GetType());
+			_controller = null;
+
 			Destroy(gameObject);
 		}
 
@@ -114,7 +116,7 @@ namespace UView {
 		/// </param>
 		public void ChangeLocation(System.Type view, object data = null)
 		{
-			if(_controller!=null && !IsHiding) _controller.ChangeLocation(view,data);	
+			if(_controller!=null && state==ViewState.Active) _controller.ChangeLocation(view,data);	
 		}
 
 		public void OpenOverlay<T>(object data = null) where T : AbstractView
@@ -152,14 +154,18 @@ namespace UView {
 		{
 			if(_controller!=null) _controller.CloseOverlay(view);	
 		}
+
+		public void CloseOverlay(AbstractView view)
+		{
+			if(_controller!=null) _controller.CloseOverlay(view);
+		}
 			
 		internal void _Create(ViewController controller, ViewDisplayMode displayMode)
 		{
 			_controller = controller;
 
 			this.displayMode = displayMode;
-			this.IsShowing = false;
-			this.IsHiding = false;
+			this.state = ViewState.Creating;
 			
 			OnCreate();
 		}	
@@ -180,7 +186,7 @@ namespace UView {
 		/// </summary>
 		protected virtual void OnShowComplete()
 		{
-			IsShowing = true;
+			state = ViewState.Active;
 			_controller._OnShowComplete(this);
 		}
 		/// <summary>
