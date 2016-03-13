@@ -167,22 +167,19 @@ namespace UView {
 				throw new UnityException (string.Format("Invalid view type: {0}",view));
 			}
 
-			if(_currentLocation==null || view!=_currentLocation.GetType()){
-
-				if(_debug) Debug.LogFormat("[ViewController] Requesting Location: {0}, immediate: {1}",view.Name,immediate);
+			if(_debug) Debug.LogFormat("[ViewController] Requesting Location: {0}, immediate: {1}",view.Name,immediate);
 				
-				if(EventViewRequested!=null) EventViewRequested(this,view,ViewDisplayMode.Location);
+			if(EventViewRequested!=null) EventViewRequested(this,view,ViewDisplayMode.Location);
 
-				if(_currentLocation==null){
-					CreateViewAsLocation(view,data);
-				} else if(immediate){
-					_currentLocation._Hide();
-					CreateViewAsLocation(view,data);
-				} else {
-					_targetLocation = view;
-					_targetLocationData = data;
-					_currentLocation._Hide();
-				}
+			if(_currentLocation==null){
+				CreateViewAsLocation(view,data);
+			} else if(immediate){
+				_currentLocation._Hide();
+				CreateViewAsLocation(view,data);
+			} else {
+				_targetLocation = view;
+				_targetLocationData = data;
+				_currentLocation._Hide();
 			}
 		}
 
