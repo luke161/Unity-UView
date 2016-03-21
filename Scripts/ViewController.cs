@@ -152,15 +152,6 @@ namespace UView {
 			ChangeLocation(typeof(T),data,immediate);
 		}
 
-		/// <summary>
-		/// Requests a new location. <c>currentLocation</c> will be hidden before the <c>targetLocation</c> is shown.
-		/// </summary>
-		/// <param name='viewName'>
-		/// Name of the new <c>targetLocation</c>.
-		/// </param>
-		/// <param name='data'>
-		/// Optional data <c>object</c> to be passed onto the <c>targetLocation</c> when it's shown.
-		/// </param>
 		public void ChangeLocation(System.Type view, object data, bool immediate = false)
 		{
 			if(!HasView(view)){
@@ -216,18 +207,6 @@ namespace UView {
 			OpenOverlay(typeof(T),data,waitForAllOverlaysToClose);
 		}
 
-		/// <summary>
-		/// Opens the specified overlay.
-		/// </summary>
-		/// <param name='overlayName'>
-		/// Name of the overlay to open.
-		/// </param>
-		/// <param name='data'>
-		/// Optional data object to be passed onto the <c>targetOverlay</c> when it's shown.
-		/// </param>
-		/// <param name='closeAll'>
-		/// Setting <c>closeAll</c> to true will close all open overlays and delay the <c>targetOverlay</c> from showing until they have all hidden.
-		/// </param>
 		public void OpenOverlay(System.Type view, object data, bool waitForAllOverlaysToClose)
 		{
 			if(!HasView(view)){
@@ -249,10 +228,6 @@ namespace UView {
 			CloseOverlay(typeof(T));
 		}
 
-		/// <summary>
-		/// Close all open overlays with the given overlay name
-		/// </summary>
-		/// <param name="overlayName">Overlay name.</param>
 		public void CloseOverlay(System.Type view)
 		{
 			if(!HasView(view)){
@@ -288,10 +263,6 @@ namespace UView {
 			Unload(typeof(T));
 		}
 
-		/// <summary>
-		/// Unload the view resource associated with viewName.
-		/// </summary>
-		/// <param name="viewName">View name.</param>
 		public void Unload(System.Type view)
 		{
 			if(IsViewLoaded(view)){
@@ -301,18 +272,12 @@ namespace UView {
 			}
 		}
 
-		/// <summary>
-		/// Unload all cached view resources.
-		/// </summary>
 		public void UnloadAll()
 		{
 			foreach(ViewAsset viewAsset in _assetLookup.Values){
 				viewAsset.Unload(true);
 			}
 		}
-
-		// All view behavour comes through the ViewController, this allows events which other views or gameObjects
-		// can listen for to respond to updates in the model.
 
 		internal void _OnShowStart(AbstractView view)
 		{
