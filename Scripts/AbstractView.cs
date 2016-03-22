@@ -191,9 +191,9 @@ namespace UView {
 		/// <param name="data">Optional data <c>object</c> to be passed onto the view when it's shown.</param>
 		/// <param name="close">Optional view to close before opening the target view.</param>
 		/// <typeparam name="T">Type of view we want to open.</typeparam>
-		public void OpenOverlay<T>(object data = nul, AbstractView close = null) where T : AbstractView
+		public void OpenOverlay<T>(object data = null, AbstractView waitForViewToClose = null) where T : AbstractView
 		{
-			OpenOverlay(typeof(T),data,close);
+			OpenOverlay(typeof(T),data,waitForViewToClose);
 		}
 
 		/// <summary>
@@ -202,9 +202,9 @@ namespace UView {
 		/// <param name="view">Type of view we want to open.</param>
 		/// <param name="data">Optional data <c>object</c> to be passed onto the view when it's shown.</param>
 		/// <param name="close">Optional view to close before opening the target view.</param>
-		public void OpenOverlay(System.Type view, object data = null, AbstractView close = null)
+		public void OpenOverlay(System.Type view, object data = null, AbstractView waitForViewToClose = null)
 		{
-			if (_controller!=null) _controller.OpenOverlay(view,data,close);
+			if (_controller!=null) _controller.OpenOverlay(view,data,waitForViewToClose);
 		}
 
 		/// <summary>
@@ -250,7 +250,7 @@ namespace UView {
 		/// <param name='data'>
 		/// Optional data property, usually passed through from the ViewProxy by another view.
 		/// </param>
-		protected virtual void OnShowStart(object data=null)
+		protected virtual void OnShowStart(object data = null)
 		{
 			OnShowComplete();
 		}
