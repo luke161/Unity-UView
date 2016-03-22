@@ -8,19 +8,34 @@ using System.Collections.Generic;
 
 namespace UView {
 
+	/// <summary>
+	/// Managed two systems, locations and overlays.
+	/// </summary>
 	public class ViewController : MonoBehaviour
 	{
 
 		public delegate void ViewEvent(ViewController sender, System.Type view, ViewDisplayMode displayMode);
 
+		/// <summary>Dispatched when a view begins to show and is transitioning in.</summary>
 		public event ViewEvent EventShowStart;
+		/// <summary>Dispatched when a view has finished transition in and is active.</summary>
 		public event ViewEvent EventShowComplete;
+		/// <summary>Dispatched when a view begins to hide and is transitioning out.</summary>
 		public event ViewEvent EventHideStart;
+		/// <summary>Dispatched when a view has finished transitioning out and is no longer active.</summary>
 		public event ViewEvent EventHideComplete;
+		/// <summary>Dispatched when a view has been requested .</summary>
 		public event ViewEvent EventViewRequested;
+		/// <summary>Dispatched when a view is created inside the <c>ViewController</c>. This happens before a ShowStart event.</summary>
 		public event ViewEvent EventViewCreated;
 
+		/// <summary>
+		/// <c>True</c> if the <c>ViewController</c> is setup and ready to use.
+		/// </summary>
 		public bool IsSetup { get; private set; }
+		/// <summary>
+		/// Transform all newly created views are parented to. If <c>null</c> views will be created without a transform parent.
+		/// </summary>
 		public Transform viewParent = null;
 
 		[SerializeField] private string _startingLocation = null;
@@ -45,6 +60,11 @@ namespace UView {
 			if(_autoSetup) Setup(System.Type.GetType(_startingLocation));
 		}
 
+		/// <summary>
+		/// Setup the <c>ViewController</c> so it's ready to use. If a starting location is set that view
+		/// will be created and shown.
+		/// </summary>
+		/// <param name="startLocation">Type of view to start the location system in.</param>
 		public void Setup(System.Type startLocation)
 		{
 			if(IsSetup) return;
@@ -73,26 +93,44 @@ namespace UView {
 			}
 		}
 
+		/// <summary>
+		/// Get the view currently showing in the location system.
+		/// </summary>
 		public AbstractView currentLocation {
 			get { return _currentLocation; }	
 		}
 
+		/// <summary>
+		/// Get the view that's been requested and will show once the current location finishes hiding.
+		/// </summary>
 		public System.Type targetLocation {
 			get { return _targetLocation; }	
 		}
 
+		/// <summary>
+		/// Gets the view that was last shown before the current location.
+		/// </summary>
 		public System.Type lastLocation{
 			get { return _lastLocation;	}
 		}
 
+		/// <summary>
+		/// Gets the view that's been requested and will show as the next overlay.
+		/// </summary>
 		public System.Type targetOverlay { 
 			get { return _targetOverlay; }
 		}
 
+		/// <summary>
+		/// An array containing all views that are currently open as overlays.
+		/// </summary>
 		public AbstractView[] showingOverlays {
 			get { return _showingOverlays.ToArray(); }
 		}
 
+		/// <summary>
+		/// Reference count for loaded view resources.
+		/// </summary>
 		public int loadedResourceCount {
 			get { 
 				int count = 0;
@@ -102,12 +140,16 @@ namespace UView {
 			}
 		}
 
-		public bool IsOverlayShowing<T>() where T : AbstractView
+		/// <returns><c>true</c> if the specified view type is open as an overlay.</returns>
+		/// <typeparam name="T">Type of view.</typeparam>
+		public bool IsOverlayOpen<T>() where T : AbstractView
 		{
-			return IsOverlayShowing(typeof(T));
+			return IsOverlayOpen(typeof(T));
 		}
 
-		public bool IsOverlayShowing(System.Type view)
+		/// <returns><c>true</c> if the specified view type is open as an overlay.</returns>
+		/// <param name="view">Type of view.</param>
+		public bool IsOverlayOpen(System.Type view)
 		{
 			int i = 0, l = _showingOverlays.Count;
 			for(; i<l; ++i){
@@ -118,7 +160,7 @@ namespace UView {
 			return false;
 		}
 
-		public bool IsOverlayShowing(AbstractView view) 
+		public bool IsOverlayOpen(AbstractView view) 
 		{
 			return _showingOverlays.Contains(view);
 		}
@@ -152,34 +194,28 @@ namespace UView {
 			ChangeLocation(typeof(T),data,immediate);
 		}
 
-		/// <summary>
-		/// Requests a new location. <c>currentLocation</c> will be hidden before the <c>targetLocation</c> is shown.
-		/// </summary>
-		/// <param name='viewName'>
-		/// Name of the new <c>targetLocation</c>.
-		/// </param>
-		/// <param name='data'>
-		/// Optional data <c>object</c> to be passed onto the <c>targetLocation</c> when it's shown.
-		/// </param>
 		public void ChangeLocation(System.Type view, object data, bool immediate = false)
 		{
 			if(!HasView(view)){
 				throw new UnityException (string.Format("Invalid view type: {0}",view));
 			}
 
-			if(_debug) Debug.LogFormat("[ViewController] Requesting Location: {0}, immediate: {1}",view.Name,immediate);
-				
-			if(EventViewRequested!=null) EventViewRequested(this,view,ViewDisplayMode.Location);
+			if(_currentLocation==null || view!=_currentLocation.GetType()){
 
-			if(_currentLocation==null){
-				CreateViewAsLocation(view,data);
-			} else if(immediate){
-				_currentLocation._Hide();
-				CreateViewAsLocation(view,data);
-			} else {
-				_targetLocation = view;
-				_targetLocationData = data;
-				_currentLocation._Hide();
+				if(_debug) Debug.LogFormat("[ViewController] Requesting Location: {0}, immediate: {1}",view.Name,immediate);
+				
+				if(EventViewRequested!=null) EventViewRequested(this,view,ViewDisplayMode.Location);
+
+				if(_currentLocation==null){
+					CreateViewAsLocation(view,data);
+				} else if(immediate){
+					_currentLocation._Hide();
+					CreateViewAsLocation(view,data);
+				} else {
+					_targetLocation = view;
+					_targetLocationData = data;
+					_currentLocation._Hide();
+				}
 			}
 		}
 
@@ -213,18 +249,6 @@ namespace UView {
 			OpenOverlay(typeof(T),data,waitForAllOverlaysToClose);
 		}
 
-		/// <summary>
-		/// Opens the specified overlay.
-		/// </summary>
-		/// <param name='overlayName'>
-		/// Name of the overlay to open.
-		/// </param>
-		/// <param name='data'>
-		/// Optional data object to be passed onto the <c>targetOverlay</c> when it's shown.
-		/// </param>
-		/// <param name='closeAll'>
-		/// Setting <c>closeAll</c> to true will close all open overlays and delay the <c>targetOverlay</c> from showing until they have all hidden.
-		/// </param>
 		public void OpenOverlay(System.Type view, object data, bool waitForAllOverlaysToClose)
 		{
 			if(!HasView(view)){
@@ -246,10 +270,6 @@ namespace UView {
 			CloseOverlay(typeof(T));
 		}
 
-		/// <summary>
-		/// Close all open overlays with the given overlay name
-		/// </summary>
-		/// <param name="overlayName">Overlay name.</param>
 		public void CloseOverlay(System.Type view)
 		{
 			if(!HasView(view)){
@@ -285,10 +305,6 @@ namespace UView {
 			Unload(typeof(T));
 		}
 
-		/// <summary>
-		/// Unload the view resource associated with viewName.
-		/// </summary>
-		/// <param name="viewName">View name.</param>
 		public void Unload(System.Type view)
 		{
 			if(IsViewLoaded(view)){
@@ -298,18 +314,12 @@ namespace UView {
 			}
 		}
 
-		/// <summary>
-		/// Unload all cached view resources.
-		/// </summary>
 		public void UnloadAll()
 		{
 			foreach(ViewAsset viewAsset in _assetLookup.Values){
 				viewAsset.Unload(true);
 			}
 		}
-
-		// All view behavour comes through the ViewController, this allows events which other views or gameObjects
-		// can listen for to respond to updates in the model.
 
 		internal void _OnShowStart(AbstractView view)
 		{

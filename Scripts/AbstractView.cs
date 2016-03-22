@@ -185,49 +185,57 @@ namespace UView {
 			if(_controller!=null && state==ViewState.Active) _controller.ChangeLocation(view,data);	
 		}
 
-		public void OpenOverlay<T>(object data = null) where T : AbstractView
+		/// <summary>
+		/// Opens the specified view as an overlay.
+		/// </summary>
+		/// <param name="data">Optional data <c>object</c> to be passed onto the view when it's shown.</param>
+		/// <param name="close">Optional view to close before opening the target view.</param>
+		/// <typeparam name="T">Type of view we want to open.</typeparam>
+		public void OpenOverlay<T>(object data = nul, AbstractView close = null) where T : AbstractView
 		{
-			OpenOverlay(typeof(T),data);
+			OpenOverlay(typeof(T),data,close);
 		}
 
 		/// <summary>
-		/// Opens the specified overlay.
+		/// Opens the specified view as an overlay.
 		/// </summary>
-		/// <param name='overlayName'>
-		/// Name of the overlay to open.
-		/// </param>
-		/// <param name='data'>
-		/// Optional data object to be passed onto the <c>targetOverlay</c> when it's shown.
-		/// </param>
-		/// <param name='close'>
-		/// Overlay to close first and delay the <c>targetOverlay</c> from showing until they have all hidden.
-		/// </param>
+		/// <param name="view">Type of view we want to open.</param>
+		/// <param name="data">Optional data <c>object</c> to be passed onto the view when it's shown.</param>
+		/// <param name="close">Optional view to close before opening the target view.</param>
 		public void OpenOverlay(System.Type view, object data = null, AbstractView close = null)
 		{
 			if (_controller!=null) _controller.OpenOverlay(view,data,close);
 		}
 
+		/// <summary>
+		/// Closes the specified view when showing as an overlay.
+		/// </summary>
+		/// <typeparam name="T">Type of view we want to close.</typeparam>
 		public void CloseOverlay<T>() where T : AbstractView
 		{
 			CloseOverlay(typeof(T));
 		}
 
 		/// <summary>
-		/// Closes the specified overlay
+		/// Closes the specified view when showing as an overlay.
 		/// </summary>
-		/// <param name="overlayName">Overlay name.</param>
+		/// <param name="view">Type of view we want to close.</param>
 		public void CloseOverlay(System.Type view)
 		{
 			if(_controller!=null) _controller.CloseOverlay(view);	
 		}
 
+		/// <summary>
+		/// Closes the specified view when showing as an overlay.
+		/// </summary>
+		/// <param name="view">The view we want to close.</param>
 		public void CloseOverlay(AbstractView view)
 		{
 			if(_controller!=null) _controller.CloseOverlay(view);
 		}
 
 		/// <summary>
-		/// Called when the View is created and before <c>Show()<c>. Override to setup your view and register any events with the <c>ViewController</c> 
+		/// Called when the View is created inside the <c>ViewController</c>. Override to setup the view and register any events with the <c>ViewController</c> 
 		/// using the <c>_controller</c> property.
 		/// </summary>
 		protected virtual void OnCreate()
@@ -236,7 +244,8 @@ namespace UView {
 		}
 		
 		/// <summary>
-		/// Called after <c>show()</c>, override this method to provide custom setup and transition behaviour for your view.
+		/// Called after <c>OnCreate</c> when the view should be presented. If you're overriding <c>OnShowStart</c> in your view you MUST call
+		/// <c>OnShowComplete</c> once any presentation/transitions have finished.
 		/// </summary>
 		/// <param name='data'>
 		/// Optional data property, usually passed through from the ViewProxy by another view.
@@ -245,25 +254,29 @@ namespace UView {
 		{
 			OnShowComplete();
 		}
+
 		/// <summary>
-		/// Called once <c>onShowStart()</c> is complete. If you override <c>onShowStart</c> or <c>onShowComplete</c> make sure you 
-		/// call the base method so that view events are dispatched correctly.
+		/// Should be called once the view has finished transitioning in, after <c>OnShowStart</c>. This will notify the <c>ViewController</c> that
+		/// the view is ready and in the <c>Active<c> state.
 		/// </summary>
 		protected virtual void OnShowComplete()
 		{
 			state = ViewState.Active;
 			_controller._OnShowComplete(this);
 		}
+
 		/// <summary>
-		/// Called after <c>hide()</c>, override this method to provide custom transition behaviour for your view.
+		/// Called from the <c>ViewController</c> when this view should close and stop presenting. If you're overriding <c>OnHideStart</c> in your view you MUST call
+		/// <c>OnHideComplete</c> once any presentation/transitions have finished.
 		/// </summary>
 		protected virtual void OnHideStart()
 		{
 			OnHideComplete();	
 		}
+
 		/// <summary>
-		/// Called once <c>onHideStart()</c> is complete. If you override <c>onHideStart</c> or <c>onShowComplete</c> make sure you
-		/// call the base method so that view events are dispatched correctly.
+		/// Should be called once the view has finished transitioning out, after <c>OnHideStart</c>. This will notify the <c>ViewController</c> that
+		/// the view is hidden and can be cleaned up.
 		/// </summary>
 		protected virtual void OnHideComplete()
 		{
