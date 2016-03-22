@@ -180,10 +180,10 @@ namespace UView {
 			return IsViewLoaded(typeof(T));
 		}
 
-		public bool IsViewLoaded(System.Type viewId)
+		public bool IsViewLoaded(System.Type view)
 		{
-			if(_assetLookup.ContainsKey(viewId)){
-				return _assetLookup[viewId].IsResourceLoaded;
+			if(_assetLookup.ContainsKey(view)){
+				return _assetLookup[view].IsResourceLoaded;
 			} else {
 				return false;
 			}
@@ -234,7 +234,7 @@ namespace UView {
 
 			if(EventViewRequested!=null) EventViewRequested(this,view,ViewDisplayMode.Overlay);
 			
-			if(waitForViewToClose!=null && IsOverlayShowing(waitForViewToClose)){
+			if(waitForViewToClose!=null && IsOverlayOpen(waitForViewToClose)){
 				_targetOverlay = view;
 				_targetOverlayData = data;
 
@@ -287,7 +287,7 @@ namespace UView {
 
 		public void CloseOverlay(AbstractView view)
 		{
-			if(IsOverlayShowing(view)){
+			if(IsOverlayOpen(view)){
 				view._Hide();
 			}
 		}
