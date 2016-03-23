@@ -9,7 +9,14 @@ using System.Collections.Generic;
 namespace UView {
 
 	/// <summary>
-	/// Managed two systems, locations and overlays.
+	/// The <c>ViewController</c> class manages the presentation of views, with two separate systems, locations and overlays.
+	/// With the location system only one view is shown at a time, moving to a new location forces the current location to hide. With the overlay
+	/// system multiple views can be presented at once, independently of each other and the location system.
+	/// 
+	/// The <c>ViewController</c> stores <c>ViewAsset</c> objects, created via the Unity editor interface that hold a reference to a prefab that
+	/// represents a view and that a view can be created from. 
+	/// 
+	/// All views are created via a <c>ViewController</c> and communicate via a <c>ViewController</c> when updating their state. 
 	/// </summary>
 	public class ViewController : MonoBehaviour
 	{
@@ -160,26 +167,31 @@ namespace UView {
 			return false;
 		}
 
+		/// <returns><c>true</c> if the specified view is open as an overlay.</returns>
 		public bool IsOverlayOpen(AbstractView view) 
 		{
 			return _showingOverlays.Contains(view);
 		}
 
+		/// <returns><c>true</c> if the <c>ViewController</c> contains a view asset for the specified view type.</returns>
 		public bool HasView<T>() where T : AbstractView
 		{
 			return HasView(typeof(T));
 		}
 
+		/// <returns><c>true</c> if the <c>ViewController</c> contains a view asset for the specified view type.</returns>
 		public bool HasView(System.Type view)
 		{
 			return _assetLookup.ContainsKey(view);
 		}
 
+		/// <returns><c>true</c> if the associated prefab resource is currently loaded for the specified view type.</returns>
 		public bool IsViewLoaded<T>() where T : AbstractView
 		{
 			return IsViewLoaded(typeof(T));
 		}
 
+		/// <returns><c>true</c> if the associated prefab resource is currently loaded for the specified view type.</returns>
 		public bool IsViewLoaded(System.Type view)
 		{
 			if(_assetLookup.ContainsKey(view)){
@@ -189,11 +201,25 @@ namespace UView {
 			}
 		}
 
+		/// <summary>
+		/// Change location to the specified view. <c>currentLocation</c> will first be hidden, and the specified view will become the <c>targetLocation</c>, once
+		/// <c>currentLocation</c> is hidden the specified view is created and shown.
+		/// </summary>
+		/// <param name="data">Data to pass onto the specified view when it begins to show <c>OnShowStart</c>.</param>
+		/// <param name="immediate">If set to <c>true</c> the <c>ViewController</c> won't wait for <c>currentLocation</c> to hide before creating the specified view.</param>
+		/// <typeparam name="T">The type of view to change location to.</typeparam>
 		public void ChangeLocation<T>(object data, bool immediate) where T : AbstractView
 		{
 			ChangeLocation(typeof(T),data,immediate);
 		}
 
+		/// <summary>
+		/// Change location to the specified view. <c>currentLocation</c> will first be hidden, and the specified view will become the <c>targetLocation</c>, once
+		/// <c>currentLocation</c> is hidden the specified view is created and shown.
+		/// </summary>
+		/// <param name="view">The type of view to change location to.</param>
+		/// <param name="data">Data to pass onto the specified view when it begins to show <c>OnShowStart</c>.</param>
+		/// <param name="immediate">If set to <c>true</c> the <c>ViewController</c> won't wait for <c>currentLocation</c> to hide before creating the specified view.</param>
 		public void ChangeLocation(System.Type view, object data, bool immediate = false)
 		{
 			if(!HasView(view)){
@@ -219,11 +245,23 @@ namespace UView {
 			}
 		}
 
+		/// <summary>
+		/// Open the specified view as an overlay. You can open multiple overlays of the same view type if required.
+		/// </summary>
+		/// <param name="data">Data to pass onto the specified view when it begins to show <c>OnShowStart</c>.</param>
+		/// <param name="waitForViewToClose">If set the <c>ViewController</c> will first hide this view (assuming it's showing as an overlay) before opening the specified view. This mimics the location system.</param>
+		/// <typeparam name="T">The type of view to open as an overlay.</typeparam>
 		public void OpenOverlay<T>(object data, AbstractView waitForViewToClose) where T : AbstractView
 		{
 			OpenOverlay(typeof(T),data,waitForViewToClose);
 		}
 
+		/// <summary>
+		/// Open the specified view as an overlay. You can open multiple overlays of the same view type if required.
+		/// </summary>
+		/// <param name="view">The type of view to open as an overlay.</param>
+		/// <param name="data">Data to pass onto the specified view when it begins to show <c>OnShowStart</c>.</param>
+		/// <param name="waitForViewToClose">If set the <c>ViewController</c> will first hide this view (assuming it's showing as an overlay) before opening the specified view. This mimics the location system.</param>
 		public void OpenOverlay(System.Type view, object data, AbstractView waitForViewToClose)
 		{
 			if(!HasView(view)){
@@ -244,11 +282,24 @@ namespace UView {
 			}
 		}
 
+		/// <summary>
+		/// Open the specified view as an overlay. You can open multiple overlays of the same view type if required.
+		/// </summary>
+		/// <param name="data">Data to pass onto the specified view when it begins to show <c>OnShowStart</c>.</param>
+		/// <param name="waitForAllOverlaysToClose">If <c>true</c> the <c>ViewController</c> will first hide all views open as overlays before opening the specified view.</param>
+		/// <typeparam name="T">The type of view to open as an overlay.</typeparam>
 		public void OpenOverlay<T>(object data, bool waitForAllOverlaysToClose) where T : AbstractView
 		{
 			OpenOverlay(typeof(T),data,waitForAllOverlaysToClose);
 		}
 
+
+		/// <summary>
+		/// Open the specified view as an overlay. You can open multiple overlays of the same view type if required.
+		/// </summary>
+		/// <param name="data">Data to pass onto the specified view when it begins to show <c>OnShowStart</c>.</param>
+		/// <param name="waitForAllOverlaysToClose">If <c>true</c> the <c>ViewController</c> will first hide all views open as overlays before opening the specified view.</param>
+		/// <param name="view">The type of view to open as an overlay.</param>
 		public void OpenOverlay(System.Type view, object data, bool waitForAllOverlaysToClose)
 		{
 			if(!HasView(view)){
@@ -265,11 +316,19 @@ namespace UView {
 			}
 		}
 
+		/// <summary>
+		/// Close the specified view.
+		/// </summary>
+		/// <typeparam name="T">The type of view to close.</typeparam>
 		public void CloseOverlay<T>() where T : AbstractView
 		{
 			CloseOverlay(typeof(T));
 		}
 
+		/// <summary>
+		/// Close the specified view.
+		/// </summary>
+		/// <param name="view">The type of view to close.</param>
 		public void CloseOverlay(System.Type view)
 		{
 			if(!HasView(view)){
@@ -285,6 +344,10 @@ namespace UView {
 			}
 		}
 
+		/// <summary>
+		/// Close the specified view.
+		/// </summary>
+		/// <param name="view">The view to close.</param>
 		public void CloseOverlay(AbstractView view)
 		{
 			if(IsOverlayOpen(view)){
@@ -292,6 +355,9 @@ namespace UView {
 			}
 		}
 
+		/// <summary>
+		/// Closes all views currently open as overlays.
+		/// </summary>
 		public void CloseAllOverlays()
 		{
 			AbstractView[] e = showingOverlays;
@@ -300,11 +366,19 @@ namespace UView {
 			}	
 		}
 
+		/// <summary>
+		/// Unload the specified view, this clears all references to the view internally in the <c>ViewController</c>.
+		/// </summary>
+		/// <typeparam name="T">The type of view to unload.</typeparam>
 		public void Unload<T>() where T : AbstractView
 		{
 			Unload(typeof(T));
 		}
 
+		/// <summary>
+		/// Unload the specified view, this clears all references to the view internally in the <c>ViewController</c>.
+		/// </summary>
+		/// <param name="view">The type of view to unload.</param>
 		public void Unload(System.Type view)
 		{
 			if(IsViewLoaded(view)){
@@ -314,6 +388,9 @@ namespace UView {
 			}
 		}
 
+		/// <summary>
+		/// Forces all currently loaded views to unload, clearing all references to the views internally in the <c>ViewController</c>.
+		/// </summary>
 		public void UnloadAll()
 		{
 			foreach(ViewAsset viewAsset in _assetLookup.Values){
@@ -479,7 +556,6 @@ namespace UView {
 			this.referenceCount = force ? 0 : Mathf.Max(0,referenceCount-1);
 
 			if(referenceCount<=0){
-				//Resources.UnloadAsset(resource);
 				this.resource = null;
 			}
 		}
