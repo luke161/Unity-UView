@@ -25,16 +25,7 @@ namespace UView {
 		private SerializedProperty _propertyStartingLocation;
 		private SerializedProperty _propertyViewAssets;
 
-		private SerializedProperty _propertySettingsPrefabsPath;
-		private SerializedProperty _propertySettingsScriptsPath;
-		private SerializedProperty _propertySettingsScriptTemplate;
-		private SerializedProperty _propertySettingsPrefabTemplate;
-
-		private UViewSettings _settings;
-		private SerializedObject _settingsObject;
-
 		private ViewList _viewList;
-		private int _tabIndex;
 		private bool _attemptedRebuild;
 
 		protected void OnEnable()
@@ -48,15 +39,7 @@ namespace UView {
 			_propertyStartingLocation = serializedObject.FindProperty("_startingLocation");
 			_propertyViewAssets = serializedObject.FindProperty("_viewAssets");
 
-			_tabIndex = 0;
 			_viewList = new ViewList(serializedObject,_propertyViewAssets);
-
-			_settings = UViewEditorUtils.GetSettings();
-			_settingsObject = new SerializedObject(_settings);
-			_propertySettingsPrefabsPath = _settingsObject.FindProperty("prefabsPath");
-			_propertySettingsScriptsPath = _settingsObject.FindProperty("scriptsPath");
-			_propertySettingsScriptTemplate = _settingsObject.FindProperty("scriptTemplate");
-			_propertySettingsPrefabTemplate = _settingsObject.FindProperty("prefabTemplate");
 		}
 
 		public override void OnInspectorGUI ()
@@ -64,31 +47,17 @@ namespace UView {
 			serializedObject.Update();
 
 			EditorGUILayout.Space();
-			EditorGUILayout.Space();
 
-			_tabIndex = GUILayout.Toolbar(_tabIndex,UViewEditorUtils.kTabs, GUILayout.ExpandWidth(true), GUILayout.Height(30)  );
+			if(Application.isPlaying){
+				DrawStatsGUI();
 
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
-
-			if(_tabIndex==0){
-
-				if(Application.isPlaying){
-					DrawStatsGUI();
-
-					EditorGUILayout.Space();
-					EditorGUILayout.Space();
-				}
-
-				EditorGUI.BeginDisabledGroup(Application.isPlaying);
-				DrawViewGUI();
-				EditorGUI.EndDisabledGroup();
-			} else {
-				DrawSettingsGUI();
+				EditorGUILayout.Space();
+				EditorGUILayout.Space();
 			}
 
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
+			EditorGUI.BeginDisabledGroup(Application.isPlaying);
+			DrawViewGUI();
+			EditorGUI.EndDisabledGroup();
 
 			serializedObject.ApplyModifiedProperties();
 		}
@@ -165,31 +134,6 @@ namespace UView {
 
 				EditorGUILayout.HelpBox("Creating View...",MessageType.Info);
 			}
-		}
-
-		private void DrawSettingsGUI()
-		{
-			_settingsObject.Update();
-
-			_propertySettingsPrefabsPath.stringValue = UViewEditorUtils.LayoutPathSelector(_propertySettingsPrefabsPath.stringValue,"Default Prefabs Path");
-
-			if(!UViewEditorUtils.ValidateResourcePath(_propertySettingsPrefabsPath.stringValue)){
-				EditorGUILayout.HelpBox(string.Format("Prefabs should be stored in a '{0}' folder",UViewEditorUtils.kResources),MessageType.Error);
-			}
-
-			_propertySettingsScriptsPath.stringValue = UViewEditorUtils.LayoutPathSelector(_propertySettingsScriptsPath.stringValue,"Default Scripts Path");
-
-			EditorGUILayout.PropertyField(_propertySettingsScriptTemplate);
-			EditorGUILayout.PropertyField(_propertySettingsPrefabTemplate);
-
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
-
-			if(GUILayout.Button("Reset to Defaults")){
-				_settings.RestoreDefaults();
-			}
-
-			_settingsObject.ApplyModifiedProperties();
 		}
 
 	}

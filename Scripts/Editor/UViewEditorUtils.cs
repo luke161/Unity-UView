@@ -29,7 +29,7 @@ namespace UView {
 			MenuCreateViewController();
 		}
 
-		[MenuItem("Tools/UView/Create ViewController")]
+		[MenuItem("Tools/UView/Create ViewController",false,100)]
 		public static void MenuCreateViewController()
 		{
 			GameObject viewController = new GameObject("ViewController");
@@ -42,13 +42,22 @@ namespace UView {
 			MenuCreateView();
 		}
 
-		[MenuItem("Tools/UView/Create View")]
+		[MenuItem("Tools/UView/Create View",false,101)]
 		public static void MenuCreateView()
 		{
 			CreateViewWindow window = ScriptableObject.CreateInstance<CreateViewWindow>();
 			window.titleContent = new GUIContent("Create View");
 			window.minSize = new Vector2(400,250);
 			window.ShowUtility();
+		}
+
+		[MenuItem("Tools/UView/UView Window",false,0)]
+		public static void MenuOpenManagerWindow()
+		{
+			UViewWindow window = ScriptableObject.CreateInstance<UViewWindow>();
+			window.titleContent = new GUIContent("UView");
+			window.minSize = new Vector2(400,400);
+			window.Show();
 		}
 
 		public static UViewSettings GetSettings()
@@ -95,7 +104,7 @@ namespace UView {
 
 			EditorGUILayout.PrefixLabel(label);
 			EditorGUILayout.SelectableLabel(currentPath,GUILayout.Height(EditorGUIUtility.singleLineHeight));
-			bool pressed = GUILayout.Button("...",EditorStyles.miniButton);
+			bool pressed = GUILayout.Button("...",EditorStyles.miniButton, GUILayout.Width(30));
 			EditorGUILayout.EndHorizontal();
 
 			if(pressed){
