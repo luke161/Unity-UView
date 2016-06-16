@@ -98,7 +98,7 @@ namespace UView {
 					GUIStyle centeredTextStyle = new GUIStyle("label");
 					centeredTextStyle.alignment = TextAnchor.MiddleCenter;
 
-					string sceneName = SceneManager.GetActiveScene()!=null ? SceneManager.GetActiveScene().name : "Unknown";
+					string sceneName = SceneManager.GetActiveScene().name;
 					string message = string.Format("No ViewController found in scene '{0}'",sceneName);
 
 					EditorGUILayout.BeginVertical();
@@ -117,7 +117,7 @@ namespace UView {
 					EditorGUILayout.BeginHorizontal();
 					GUILayout.FlexibleSpace();
 					if(GUILayout.Button("Create ViewController", GUILayout.Width(180), GUILayout.Height(30))){
-						UViewEditorUtils.MenuCreateViewController();
+						UViewEditorUtils.ContextCreateViewController();
 					}
 					GUILayout.FlexibleSpace();
 					EditorGUILayout.EndHorizontal();

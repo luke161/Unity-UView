@@ -100,7 +100,7 @@ namespace UView {
 
 		private void OnCreateViewCallback()
 		{
-			UViewEditorUtils.MenuCreateView();
+			UViewEditorUtils.ContextCreateView();
 		}
 
 		private void OnAddViewCallback(object view)

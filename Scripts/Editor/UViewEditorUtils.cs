@@ -26,12 +26,6 @@ namespace UView {
 		[MenuItem("GameObject/Create Other/UView/ViewController")]
 		public static void ContextCreateViewController()
 		{
-			MenuCreateViewController();
-		}
-
-		[MenuItem("Tools/UView/Create ViewController",false,100)]
-		public static void MenuCreateViewController()
-		{
 			GameObject viewController = new GameObject("ViewController");
 			viewController.AddComponent<ViewController>();
 		}
@@ -39,19 +33,13 @@ namespace UView {
 		[MenuItem("Assets/Create/UView/View")]
 		public static void ContextCreateView()
 		{
-			MenuCreateView();
-		}
-
-		[MenuItem("Tools/UView/Create View",false,101)]
-		public static void MenuCreateView()
-		{
 			CreateViewWindow window = ScriptableObject.CreateInstance<CreateViewWindow>();
 			window.titleContent = new GUIContent("Create View");
 			window.minSize = new Vector2(400,250);
 			window.ShowUtility();
 		}
 
-		[MenuItem("Tools/UView/UView Window",false,0)]
+		[MenuItem("Tools/UView")]
 		public static void MenuOpenManagerWindow()
 		{
 			UViewWindow window = ScriptableObject.CreateInstance<UViewWindow>();
