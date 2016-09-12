@@ -67,7 +67,7 @@ namespace UView {
 			return settings;
 		}
 
-		public static  string GetResourcePath(string assetPath)
+		public static string GetResourcePath(string assetPath)
 		{
 			string result = assetPath.Substring(assetPath.IndexOf(kResources)+kResources.Length);
 			result = result.Substring(0,result.LastIndexOf("."));
