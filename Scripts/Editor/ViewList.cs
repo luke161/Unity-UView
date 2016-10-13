@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEditorInternal;
 using System.Collections;
+using System.Collections.Generic;
 
 /**
  * ViewList.cs
@@ -15,16 +16,33 @@ namespace UView {
 
 		public bool requiresRebuild = false;
 
+		private Dictionary<System.Type,AbstractView> _loadedViews;
 		private SerializedProperty _propertyViewParent;
 
 		public ViewList(SerializedObject serializedObject, SerializedProperty elements) : base(serializedObject,elements)
 		{
+			_loadedViews = new Dictionary<System.Type,AbstractView>();
 			_propertyViewParent = serializedObject.FindProperty("viewParent");
 
 			this.drawHeaderCallback = DrawHeaderCallback;
 			this.drawElementCallback = DrawElementCallback;
 			this.onRemoveCallback = OnRemoveCallback;
 			this.onAddDropdownCallback = OnAddDropdownCallback;
+		}
+
+		public void UpdateLoadedViews()
+		{
+			_loadedViews.Clear();
+
+			Object[] gameObjects = Resources.FindObjectsOfTypeAll(typeof(AbstractView));
+			int i = 0, l = gameObjects.Length;
+			for(; i<l; ++i){
+
+				AbstractView view = gameObjects[i] as AbstractView;
+				if(!EditorUtility.IsPersistent(view)){
+					_loadedViews.Add(view.GetType(),view);
+				}
+			}
 		}
 
 		private void DrawHeaderCallback(Rect rect) 
@@ -39,18 +57,21 @@ namespace UView {
 			SerializedProperty propertyAssetID = propertyViewAsset.FindPropertyRelative("assetID");
 
 			string viewName = UViewEditorUtils.GetViewName(propertyViewTypeID);
+			string assetPath = AssetDatabase.GUIDToAssetPath(propertyAssetID.stringValue);
 
-			AbstractView viewAsset = AssetDatabase.LoadAssetAtPath<AbstractView>(AssetDatabase.GUIDToAssetPath(propertyAssetID.stringValue));
-			if(viewAsset!=null){
+			System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+			if(assetType!=null && assetType==typeof(GameObject)){
 
 				EditorGUI.LabelField(new Rect(rect.x,rect.y,rect.width,rect.height),viewName);
 
-				AbstractView sceneInstance = UViewEditorUtils.FindLoadedView(viewAsset.GetType());
+				System.Type viewType = System.Type.GetType(propertyViewTypeID.stringValue);
+				AbstractView sceneInstance = _loadedViews.ContainsKey(viewType) ? _loadedViews[viewType] : null;
 
 				bool existsInScene = sceneInstance!=null;
 				if(existsInScene && GUI.Button(new Rect(rect.x+rect.width-55,rect.y,55,rect.height-4), "Unload", EditorStyles.miniButton)){
 					GameObject.DestroyImmediate(sceneInstance.gameObject);
 				} else if(!existsInScene && GUI.Button(new Rect(rect.x+rect.width-55,rect.y,55,rect.height-4),"Load", EditorStyles.miniButton)){
+					AbstractView viewAsset = AssetDatabase.LoadAssetAtPath<AbstractView>(assetPath);
 					AbstractView instance = PrefabUtility.InstantiatePrefab(viewAsset) as AbstractView;
 					instance.gameObject.hideFlags = HideFlags.DontSaveInEditor;
 					instance.transform.SetParent(_propertyViewParent.objectReferenceValue as Transform,false);

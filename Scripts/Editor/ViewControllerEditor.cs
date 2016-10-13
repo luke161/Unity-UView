@@ -108,6 +108,7 @@ namespace UView {
 			EditorGUI.BeginDisabledGroup(locked);
 
 			_viewList.requiresRebuild = false;
+			_viewList.UpdateLoadedViews();
 			_viewList.DoLayoutList();
 			if(_viewList.requiresRebuild && !_attemptedRebuild){
 				Debug.LogWarning("Views missing or changed, rebuilding...");

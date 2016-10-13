@@ -105,21 +105,6 @@ namespace UView {
 			return currentPath;
 		}
 
-		public static AbstractView FindLoadedView(System.Type type)
-		{
-			Object[] gameObjects = Resources.FindObjectsOfTypeAll(type);
-			int i = 0, l = gameObjects.Length;
-			for(; i<l; ++i){
-
-				AbstractView view = gameObjects[i] as AbstractView;
-				if(!EditorUtility.IsPersistent(view)){
-					return view;
-				}
-			}
-
-			return null;
-		}
-
 		public static string GetViewName(SerializedProperty property)
 		{
 			try {
