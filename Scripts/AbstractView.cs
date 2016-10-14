@@ -148,8 +148,20 @@ namespace UView {
 		}
 
 		/// <summary>
+		/// Sets the parent of this views Transform and calls <code>GetSiblingIndex</code>.
+		/// </summary>
+		/// <param name="viewParent">The parent transform for this View</param>
+		/// <param name="displayMode">The display mode for this View.</param>
+		public virtual void SetParent(Transform viewParent, ViewDisplayMode displayMode)
+		{
+			transform.SetParent(viewParent,false);
+			int siblingIndex = GetSiblingIndex(viewParent,displayMode);
+			if(siblingIndex>-1) transform.SetSiblingIndex(siblingIndex);
+		}
+
+		/// <summary>
 		/// Effects the position of this View within a transform hierarchy, useful when working with Unity UI. The default behaviour is to put all Locations at 0
-		/// and Overlays at the top. If the view has no parent -1 is returned. Override this function to provide custom logic per View.
+		/// and Overlays at the top. If the view has no parent -1 is returned.
 		/// </summary>
 		/// <returns>The sibling index.</returns>
 		/// <param name="viewParent">The parent transform for this View</param>
