@@ -27,10 +27,12 @@ namespace UView {
 
 		private ViewList _viewList;
 		private bool _attemptedRebuild;
+		private bool _showInvalidWarning;
 
 		protected void OnEnable()
 		{
 			_attemptedRebuild = false;
+			_showInvalidWarning = false;
 
 			_propertyAutoSetup = serializedObject.FindProperty("_autoSetup");
 			_propertyDontDestroyOnLoad = serializedObject.FindProperty("_dontDestroyOnLoad");
@@ -124,13 +126,20 @@ namespace UView {
 
 			EditorGUILayout.LabelField("Add Existing",GUILayout.Width(80));
 
-			AbstractView view = EditorGUILayout.ObjectField(null,typeof(AbstractView),false) as AbstractView;
-			if(view!=null){
-				// check this view isn't already in the list
+			GameObject viewGameObject = EditorGUILayout.ObjectField(null,typeof(GameObject),false) as GameObject;
+			if(viewGameObject!=null){
+				AbstractView view = viewGameObject.GetComponent<AbstractView>();
+				if(view!=null){
+					// TODO: check this view isn't already in the list
 
-				int index = _propertyViewAssets.arraySize;
-				_propertyViewAssets.InsertArrayElementAtIndex(index);
-				UViewEditorUtils.CreateViewAsset(_propertyViewAssets.GetArrayElementAtIndex(index),view as AbstractView);
+					_showInvalidWarning = false;
+
+					int index = _propertyViewAssets.arraySize;
+					_propertyViewAssets.InsertArrayElementAtIndex(index);
+					UViewEditorUtils.CreateViewAsset(_propertyViewAssets.GetArrayElementAtIndex(index),view as AbstractView);
+				} else {
+					_showInvalidWarning = true;
+				}
 			}
 
 			if(GUILayout.Button("Create New",GUILayout.Width(100))){
@@ -152,9 +161,13 @@ namespace UView {
 			EditorGUILayout.Space();
 			EditorGUILayout.EndVertical();
 
-			EditorGUILayout.Space();
-
 			EditorGUI.EndDisabledGroup();
+
+			if(_showInvalidWarning){
+				EditorGUILayout.HelpBox("Asset must have an AbstractView component attached",MessageType.Warning);
+			}
+
+			EditorGUILayout.Space();
 
 			if(locked){
 				EditorGUILayout.Space();
