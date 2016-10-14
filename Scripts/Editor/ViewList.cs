@@ -19,7 +19,7 @@ namespace UView {
 		private Dictionary<System.Type,AbstractView> _loadedViews;
 		private SerializedProperty _propertyViewParent;
 
-		public ViewList(SerializedObject serializedObject, SerializedProperty elements) : base(serializedObject,elements)
+		public ViewList(SerializedObject serializedObject, SerializedProperty elements) : base(serializedObject,elements,true,true,true,true)
 		{
 			_loadedViews = new Dictionary<System.Type,AbstractView>();
 			_propertyViewParent = serializedObject.FindProperty("viewParent");
@@ -27,7 +27,7 @@ namespace UView {
 			this.drawHeaderCallback = DrawHeaderCallback;
 			this.drawElementCallback = DrawElementCallback;
 			this.onRemoveCallback = OnRemoveCallback;
-			this.onAddDropdownCallback = OnAddDropdownCallback;
+			this.onAddCallback = OnAddCallback;
 		}
 
 		public void UpdateLoadedViews()
@@ -96,43 +96,9 @@ namespace UView {
 			}
 		}
 
-		private void OnAddDropdownCallback(Rect buttonRect, ReorderableList list) 
-		{  
-			AssetDatabase.Refresh();
-
-			GenericMenu menu = new GenericMenu();
-			menu.AddItem(new GUIContent("Create New"),false,OnCreateViewCallback);
-			menu.AddSeparator(string.Empty);
-
-			string[] currentViews = UViewEditorUtils.GetViewNames(serializedProperty,false);
-			string[] assets = AssetDatabase.FindAssets("t:Prefab");
-
-			int i = 0, l = assets.Length;
-			for(; i<l; ++i){
-				
-				AbstractView view = AssetDatabase.LoadAssetAtPath<AbstractView>( AssetDatabase.GUIDToAssetPath( assets[i] ));
-				if(view!=null && System.Array.IndexOf<string>(currentViews,view.GetType().AssemblyQualifiedName)==-1){
-					menu.AddItem(new GUIContent(view.ToString()),false,OnAddViewCallback,view);
-				}
-			}
-
-			menu.ShowAsContext();
-		}
-
-		private void OnCreateViewCallback()
+		private void OnAddCallback(ReorderableList list)
 		{
 			UViewEditorUtils.ContextCreateView();
-		}
-
-		private void OnAddViewCallback(object view)
-		{
-			serializedProperty.serializedObject.Update();
-
-			int index = serializedProperty.arraySize;
-			serializedProperty.InsertArrayElementAtIndex(index);
-			UViewEditorUtils.CreateViewAsset(serializedProperty.GetArrayElementAtIndex(index),view as AbstractView);
-
-			serializedProperty.serializedObject.ApplyModifiedProperties();
 		}
 
 	}

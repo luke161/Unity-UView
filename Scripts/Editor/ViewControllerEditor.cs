@@ -117,17 +117,44 @@ namespace UView {
 				_attemptedRebuild = true;
 			}
 
-			EditorGUI.EndDisabledGroup();
-
+			EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 			EditorGUILayout.Space();
-
 			EditorGUILayout.BeginHorizontal();
-			GUILayout.FlexibleSpace();
-			if(GUILayout.Button("Rebuild",GUILayout.Width(80))){
+			GUILayout.Space(5);
+
+			EditorGUILayout.LabelField("Add Existing",GUILayout.Width(80));
+
+			AbstractView view = EditorGUILayout.ObjectField(null,typeof(AbstractView),false) as AbstractView;
+			if(view!=null){
+				// check this view isn't already in the list
+
+				int index = _propertyViewAssets.arraySize;
+				_propertyViewAssets.InsertArrayElementAtIndex(index);
+				UViewEditorUtils.CreateViewAsset(_propertyViewAssets.GetArrayElementAtIndex(index),view as AbstractView);
+			}
+
+			if(GUILayout.Button("Create New",GUILayout.Width(100))){
+				UViewEditorUtils.ContextCreateView();
+			}
+
+			GUILayout.Space(5);
+			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.BeginHorizontal();
+			GUILayout.Space(5);
+
+			if(GUILayout.Button("Rebuild List",GUILayout.Width(110))){
 				_attemptedRebuild = false;
 				UViewEditorUtils.Rebuild(_propertyViewAssets);
 			}
+
 			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.Space();
+			EditorGUILayout.EndVertical();
+
+			EditorGUILayout.Space();
+
+			EditorGUI.EndDisabledGroup();
 
 			if(locked){
 				EditorGUILayout.Space();

@@ -35,7 +35,7 @@ namespace UView {
 		{
 			CreateViewWindow window = ScriptableObject.CreateInstance<CreateViewWindow>();
 			window.titleContent = new GUIContent("Create View");
-			window.minSize = new Vector2(400,250);
+			window.minSize = new Vector2(400,200);
 			window.ShowUtility();
 		}
 
