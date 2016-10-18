@@ -21,7 +21,7 @@ namespace UView {
 
 		public const string kSettingsPath = "Assets/";
 		public const string kSettingsAssetName = "-UViewSettings.asset";
-		public const string kResources = "Resources/";
+		public const string kResources = "/Resources/";
 
 		[MenuItem("GameObject/Create Other/UView/ViewController")]
 		public static void ContextCreateViewController()
@@ -163,7 +163,24 @@ namespace UView {
 
 		public static bool ValidateResourcePath(string path)
 		{
-			return path.Contains(string.Concat(Path.DirectorySeparatorChar,kResources));
+			return path.Contains(kResources);
+		}
+
+		public static bool ValidateViewAsset(SerializedProperty property)
+		{
+			SerializedProperty propertyViewTypeID = property.FindPropertyRelative("viewTypeID");
+			SerializedProperty propertyAssetID = property.FindPropertyRelative("assetID");
+
+			if(!string.IsNullOrEmpty(propertyAssetID.stringValue) && !string.IsNullOrEmpty(propertyViewTypeID.stringValue)){
+
+				string assetPath = AssetDatabase.GUIDToAssetPath(propertyAssetID.stringValue);
+				System.Type baseType = typeof(AbstractView);
+				System.Type viewType = System.Type.GetType(propertyViewTypeID.stringValue);
+
+				return File.Exists(assetPath) && viewType!=null && baseType.IsAssignableFrom(viewType);
+			} else {
+				return false;
+			}
 		}
 
 		public static void Rebuild(SerializedProperty propertyViewAssets)

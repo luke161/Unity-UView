@@ -28,6 +28,7 @@ namespace UView {
 			this.drawElementCallback = DrawElementCallback;
 			this.onRemoveCallback = OnRemoveCallback;
 			this.onAddCallback = OnAddCallback;
+			this.onSelectCallback = OnSelectedCallback;
 		}
 
 		public void UpdateLoadedViews()
@@ -59,24 +60,28 @@ namespace UView {
 			string viewName = UViewEditorUtils.GetViewName(propertyViewTypeID);
 			string assetPath = AssetDatabase.GUIDToAssetPath(propertyAssetID.stringValue);
 
-			System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-			if(assetType!=null && assetType==typeof(GameObject)){
-
-				EditorGUI.LabelField(new Rect(rect.x,rect.y,rect.width,rect.height),viewName);
+			if(UViewEditorUtils.ValidateViewAsset(propertyViewAsset)){
 
 				System.Type viewType = System.Type.GetType(propertyViewTypeID.stringValue);
 				AbstractView sceneInstance = _loadedViews.ContainsKey(viewType) ? _loadedViews[viewType] : null;
-
 				bool existsInScene = sceneInstance!=null;
+
+				EditorGUI.LabelField(new Rect(rect.x,rect.y,rect.width,rect.height),existsInScene ? string.Format("{0} (Loaded)",viewName) : viewName);
+
 				if(existsInScene && GUI.Button(new Rect(rect.x+rect.width-55,rect.y,55,rect.height-4), "Unload", EditorStyles.miniButton)){
 					GameObject.DestroyImmediate(sceneInstance.gameObject);
 				} else if(!existsInScene && GUI.Button(new Rect(rect.x+rect.width-55,rect.y,55,rect.height-4),"Load", EditorStyles.miniButton)){
-					AbstractView viewAsset = AssetDatabase.LoadAssetAtPath<AbstractView>(assetPath);
-					AbstractView instance = PrefabUtility.InstantiatePrefab(viewAsset) as AbstractView;
-					instance.gameObject.hideFlags = HideFlags.DontSaveInEditor;
-					instance.transform.SetParent(_propertyViewParent.objectReferenceValue as Transform,false);
 
-					Selection.activeGameObject = instance.gameObject;
+					AbstractView viewAsset = AssetDatabase.LoadAssetAtPath<AbstractView>(assetPath);
+					if(viewAsset!=null){
+						AbstractView instance = PrefabUtility.InstantiatePrefab(viewAsset) as AbstractView;
+						instance.gameObject.hideFlags = HideFlags.DontSaveInEditor;
+						instance.transform.SetParent(_propertyViewParent.objectReferenceValue as Transform,false);
+
+						Selection.activeGameObject = instance.gameObject;
+					} else {
+						Debug.LogErrorFormat("Unable to load {0} ({1}), missing an AbstractView component",viewName,assetPath);
+					}
 				}
 			} else {
 				EditorGUI.LabelField(new Rect(rect.x,rect.y,rect.width,rect.height),string.Format("{0} (Asset Missing)",viewName),EditorStyles.boldLabel);
@@ -99,6 +104,17 @@ namespace UView {
 		private void OnAddCallback(ReorderableList list)
 		{
 			UViewEditorUtils.ContextCreateView();
+		}
+
+		private void OnSelectedCallback(ReorderableList list)
+		{
+			SerializedProperty propertyViewAsset = serializedProperty.GetArrayElementAtIndex(list.index);
+			SerializedProperty propertyAssetID = propertyViewAsset.FindPropertyRelative("assetID");
+
+			string assetPath = AssetDatabase.GUIDToAssetPath(propertyAssetID.stringValue);
+			if(!string.IsNullOrEmpty(assetPath)){
+				EditorGUIUtility.PingObject(AssetDatabase.LoadMainAssetAtPath(assetPath));
+			}
 		}
 
 	}
