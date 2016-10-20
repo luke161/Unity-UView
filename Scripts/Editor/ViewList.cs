@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 using System.Collections;
@@ -66,7 +66,7 @@ namespace UView {
 				AbstractView sceneInstance = _loadedViews.ContainsKey(viewType) ? _loadedViews[viewType] : null;
 				bool existsInScene = sceneInstance!=null;
 
-				EditorGUI.LabelField(new Rect(rect.x,rect.y,rect.width,rect.height),existsInScene ? string.Format("{0} (Loaded)",viewName) : viewName);
+				EditorGUI.LabelField(new Rect(rect.x,rect.y,rect.width,rect.height),existsInScene ? string.Format("{0} (Loaded)",viewName) : viewName, existsInScene ? EditorStyles.boldLabel : EditorStyles.label);
 
 				if(existsInScene && GUI.Button(new Rect(rect.x+rect.width-55,rect.y,55,rect.height-4), "Unload", EditorStyles.miniButton)){
 					GameObject.DestroyImmediate(sceneInstance.gameObject);
@@ -76,7 +76,7 @@ namespace UView {
 					if(viewAsset!=null){
 						AbstractView instance = PrefabUtility.InstantiatePrefab(viewAsset) as AbstractView;
 						instance.gameObject.hideFlags = HideFlags.DontSaveInEditor;
-						instance.transform.SetParent(_propertyViewParent.objectReferenceValue as Transform,false);
+						instance.SetParent(_propertyViewParent.objectReferenceValue as Transform,ViewDisplayMode.Overlay);
 
 						Selection.activeGameObject = instance.gameObject;
 					} else {
