@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEditor;
 using System.Collections;
@@ -73,17 +73,31 @@ namespace UView {
 
 			if(_tabIndex==0){
 
-				ViewController controller = GameObject.FindObjectOfType<ViewController>();
+				ViewController[] controllers = GameObject.FindObjectsOfType<ViewController>();
 
-				if(controller!=null){
+				if(controllers.Length>0){
+
+					ViewController controller = null;
+						
+					if(controllers.Length==1){
+						controller = controllers[0];
+						EditorGUILayout.ObjectField("View Controller",controller,typeof(ViewController),true);
+					} else {
+
+						string[] names = new string[controllers.Length];
+						int i = 0, l = names.Length;
+						for(; i<l; ++i) names[i] = controllers[i].gameObject.name;
+
+						int index = System.Array.IndexOf<ViewController>(controllers,_viewController);
+						index = EditorGUILayout.Popup("View Controller",index,names);
+						controller = controllers[index];
+					}
 
 					if(controller!=_viewController){
 						if(_viewControllerEditor!=null) DestroyImmediate(_viewControllerEditor);
 						_viewControllerEditor = Editor.CreateEditor(controller);
 						_viewController = controller;
 					}
-
-					EditorGUILayout.ObjectField("View Controller",_viewController,typeof(ViewController),true);
 						
 					_viewControllerEditor.OnInspectorGUI();
 
