@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEditor;
 using System.Collections;
@@ -89,8 +89,10 @@ namespace UView {
 						for(; i<l; ++i) names[i] = controllers[i].gameObject.name;
 
 						int index = System.Array.IndexOf<ViewController>(controllers,_viewController);
+						if(index<0) index = 0;
+
 						index = EditorGUILayout.Popup("View Controller",index,names);
-						controller = controllers[index];
+						controller = index>=0 && index<controllers.Length ? controllers[index] : null;
 					}
 
 					if(controller!=_viewController){
@@ -99,7 +101,7 @@ namespace UView {
 						_viewController = controller;
 					}
 						
-					_viewControllerEditor.OnInspectorGUI();
+					if(_viewControllerEditor!=null) _viewControllerEditor.OnInspectorGUI();
 
 				} else {
 

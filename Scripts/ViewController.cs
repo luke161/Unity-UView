@@ -141,7 +141,7 @@ namespace UView {
 		public int loadedResourceCount {
 			get { 
 				int count = 0;
-				foreach(ViewAsset asset in _assetLookup.Values) if(asset.IsResourceLoaded) count++;
+				if(_assetLookup!=null) foreach(ViewAsset asset in _assetLookup.Values) if(asset.IsResourceLoaded) count++;
 
 				return count; 
 			}

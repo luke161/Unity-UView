@@ -67,6 +67,7 @@ namespace UView {
 		private void DrawStatsGUI()
 		{
 			ViewController viewController = target as ViewController;
+			if(viewController==null || viewController.currentLocation==null) return;
 
 			UViewEditorUtils.LayoutLabelWithPrefix("Loaded Resources",viewController.loadedResourceCount);
 
