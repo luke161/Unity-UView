@@ -84,11 +84,9 @@ namespace UView {
 		}
 
 		private string CreatePath(string viewName, string folder, string extension)
-		{
-			// TODO : Validate paths.
+		{			
 			viewName = viewName.Replace(" ","");
-
-			return string.Format("{0}/{1}.{2}",folder,viewName,extension).Trim();
+			return Path.Combine(folder,string.Format("{0}.{1}",viewName,extension));
 		}
 
 		private void CreateView(string viewName, string prefabsFolder, string scriptsFolder)
