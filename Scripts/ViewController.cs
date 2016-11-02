@@ -492,13 +492,13 @@ namespace UView {
 				}
 
 				// setup view inside viewParent
-				view.SetParent(viewParent,view.displayMode);
+				view.SetParent(viewParent,displayMode);
 
 				// finish view creation
 				view._Create (this,displayMode);
 
 				if (EventViewCreated != null)
-					EventViewCreated (this, asset.viewType, view.displayMode);
+					EventViewCreated (this, asset.viewType, displayMode);
 
 				return view;
 			} else {
