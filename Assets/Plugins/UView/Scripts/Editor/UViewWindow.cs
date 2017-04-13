@@ -11,26 +11,15 @@ namespace UView {
 		private int _tabIndex;
 		private Vector2 _scroll;
 		private ViewController _viewController;
-		private Editor _viewControllerEditor;
-
 		private UViewSettings _settings;
-		private SerializedObject _settingsObject;
-
-		private SerializedProperty _propertySettingsPrefabsPath;
-		private SerializedProperty _propertySettingsScriptsPath;
-		private SerializedProperty _propertySettingsScriptTemplate;
-		private SerializedProperty _propertySettingsPrefabTemplate;
+		private Editor _viewControllerEditor;
+		private Editor _settingsEditor;
 
 		protected void OnEnable()
 		{
 			_tabIndex = 0;
 
 			_settings = UViewEditorUtils.GetSettings();
-			_settingsObject = new SerializedObject(_settings);
-			_propertySettingsPrefabsPath = _settingsObject.FindProperty("prefabsPath");
-			_propertySettingsScriptsPath = _settingsObject.FindProperty("scriptsPath");
-			_propertySettingsScriptTemplate = _settingsObject.FindProperty("scriptTemplate");
-			_propertySettingsPrefabTemplate = _settingsObject.FindProperty("prefabTemplate");
 
 			EditorApplication.playmodeStateChanged += HandlePlayStateChanged;
 		}
@@ -144,7 +133,9 @@ namespace UView {
 				}
 
 			} else {
-				DrawSettingsGUI();
+				if(_settingsEditor==null) _settingsEditor = Editor.CreateEditor(_settings);
+
+				_settingsEditor.OnInspectorGUI();
 			}
 
 			EditorGUILayout.Space();
@@ -155,37 +146,6 @@ namespace UView {
 			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.EndScrollView();
-		}
-
-		private void DrawSettingsGUI()
-		{
-			_settingsObject.Update();
-
-			_propertySettingsPrefabsPath.stringValue = UViewEditorUtils.LayoutPathSelector(_propertySettingsPrefabsPath.stringValue,"Default Prefabs Path");
-
-			if(!UViewEditorUtils.ValidateResourcePath(_propertySettingsPrefabsPath.stringValue)){
-				EditorGUILayout.HelpBox(string.Format("Prefabs should be stored in a '{0}' folder",UViewEditorUtils.kResources),MessageType.Error);
-			}
-
-			_propertySettingsScriptsPath.stringValue = UViewEditorUtils.LayoutPathSelector(_propertySettingsScriptsPath.stringValue,"Default Scripts Path");
-
-			EditorGUILayout.PropertyField(_propertySettingsScriptTemplate);
-			EditorGUILayout.PropertyField(_propertySettingsPrefabTemplate);
-
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
-
-			EditorGUILayout.BeginHorizontal();
-
-			GUILayout.FlexibleSpace();
-
-			if(GUILayout.Button("Reset to Defaults",GUILayout.Width(120))){
-				_settings.RestoreDefaults();
-			}
-
-			EditorGUILayout.EndHorizontal();
-
-			_settingsObject.ApplyModifiedProperties();
 		}
 
 	}

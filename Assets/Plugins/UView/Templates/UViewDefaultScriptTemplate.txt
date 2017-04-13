@@ -1,29 +1,28 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 using UView;
 
-public class {VIEW_NAME} : AbstractView {
-
-	public {VIEW_NAME}() : base()
-	{
-
-	}
+public class {VIEW_NAME} : AbstractView 
+{
 
 	protected override void OnCreate ()
 	{
-		
+		// view setup
 	}
 
 	protected override void OnShowStart (object data)
 	{
-		
+		// handle transitioning in to view
 
 		OnShowComplete();
 	}
 
 	protected override void OnHideStart ()
 	{
+		// handle transitioning out from view
 
 		OnHideComplete();
 	}

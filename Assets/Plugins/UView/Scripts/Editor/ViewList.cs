@@ -75,7 +75,6 @@ namespace UView {
 					AbstractView viewAsset = AssetDatabase.LoadAssetAtPath<AbstractView>(assetPath);
 					if(viewAsset!=null){
 						AbstractView instance = PrefabUtility.InstantiatePrefab(viewAsset) as AbstractView;
-						instance.gameObject.hideFlags = HideFlags.DontSaveInEditor;
 						instance.SetParent(_propertyViewParent.objectReferenceValue as Transform,ViewDisplayMode.Overlay);
 
 						Selection.activeGameObject = instance.gameObject;

@@ -21,6 +21,7 @@ namespace UView {
 
 		public const string kSettingsPath = "Assets/";
 		public const string kSettingsAssetName = "-UViewSettings.asset";
+		public const string kDefaultSettingsPath = "Assets/Plugins/UView/DefaultSettings.asset";
 		public const string kResources = "/Resources/";
 
 		[MenuItem("GameObject/Create Other/UView/ViewController")]
@@ -50,12 +51,12 @@ namespace UView {
 
 		public static UViewSettings GetSettings()
 		{
-			string settingsPath = string.Concat(UViewEditorUtils.kSettingsPath,UViewEditorUtils.kSettingsAssetName);
+			string settingsPath = Path.Combine(UViewEditorUtils.kSettingsPath,UViewEditorUtils.kSettingsAssetName);
 			UViewSettings settings = AssetDatabase.LoadAssetAtPath<UViewSettings>(settingsPath);
 
 			if(settings==null){
-				settings = ScriptableObject.CreateInstance<UViewSettings>();
-				settings.RestoreDefaults();
+				UViewSettings defaults = AssetDatabase.LoadAssetAtPath<UViewSettings>(UViewEditorUtils.kDefaultSettingsPath);
+				settings = GameObject.Instantiate<UViewSettings>(defaults);
 
 				if(!Directory.Exists(UViewEditorUtils.kSettingsPath)) Directory.CreateDirectory(UViewEditorUtils.kSettingsPath);
 
